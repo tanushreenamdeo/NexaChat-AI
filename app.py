@@ -7,17 +7,12 @@ import speech_recognition as sr
 from gtts import gTTS
 import tempfile
 
-# -------------------------
-# LOAD ENV
-# -------------------------
 load_dotenv()
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 CHAT_FILE = "chats.json"
 
-# -------------------------
-# LOAD & SAVE
-# -------------------------
+
 def load_chats():
     if os.path.exists(CHAT_FILE):
         with open(CHAT_FILE, "r") as f:
@@ -28,15 +23,11 @@ def save_chats(data):
     with open(CHAT_FILE, "w") as f:
         json.dump(data, f)
 
-# -------------------------
-# AUTO TITLE GENERATION
-# -------------------------
+
 def generate_chat_title(message):
     return message[:30] + "..." if len(message) > 30 else message
 
-# -------------------------
-# VOICE INPUT
-# -------------------------
+
 def get_voice_input():
     r = sr.Recognizer()
     try:
@@ -47,14 +38,10 @@ def get_voice_input():
     except:
         return None
 
-# -------------------------
-# PAGE CONFIG
-# -------------------------
+
 st.set_page_config(page_title="NexaChat AI", layout="wide")
 
-# -------------------------
-# UI STYLE
-# -------------------------
+
 st.markdown("""
 <style>
 section[data-testid="stSidebar"] {
@@ -70,9 +57,6 @@ section[data-testid="stSidebar"] * {
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------------
-# SESSION INIT
-# -------------------------
 if "chats" not in st.session_state:
     st.session_state.chats = load_chats()
 
@@ -80,10 +64,8 @@ if "current_chat" not in st.session_state:
     st.session_state.current_chat = "Current Chat "
     st.session_state.chats["Current Chat "] = []
 
-# -------------------------
-# SIDEBAR
-# -------------------------
-st.sidebar.title("💬 NexaChat")
+
+st.sidebar.title(" NexaChat")
 
 if st.sidebar.button("➕ New Chat", key="new_chat_btn"):
     new_chat = f"Chat {len(st.session_state.chats)+1}"
@@ -100,10 +82,8 @@ for i, chat in enumerate(list(st.session_state.chats.keys())[::-1]):
     if st.sidebar.button(label, key=f"chat_{i}"):
         st.session_state.current_chat = chat
 
-# -------------------------
-# MAIN CHAT
-# -------------------------
-st.title("🤖 NexaChat AI")
+
+st.title(" NexaChat AI")
 
 messages = st.session_state.chats[st.session_state.current_chat]
 
@@ -112,9 +92,6 @@ for msg in messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
 
-# -------------------------
-# INPUT + MIC
-# -------------------------
 col1, col2 = st.columns([8,1])
 
 with col1:
@@ -126,9 +103,7 @@ with col2:
         if voice:
             user_input = voice
 
-# -------------------------
-# PROCESS
-# -------------------------
+
 if user_input:
 
     # If first message → rename chat
@@ -172,7 +147,5 @@ if user_input:
             except:
                 pass
 
-# -------------------------
 # SAVE
-# -------------------------
 save_chats(st.session_state.chats)
